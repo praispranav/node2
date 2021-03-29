@@ -10,24 +10,19 @@ MongoClient.connect(url,(err,client)=>{
 
     console.log("Database Connection success To conFusion");
     const db = client.db(dbname);
-    const collection = db.collection("dishes");
-    collection.insertOne({"name":"Uthapizza","description":"Hello this is first description"},(err,result)=>{
-        assert.equal(err,null);
+    dboper.insertDocument(db, {name:"vadolnut", description:"this is forst description"},'dishes',(result)=>{
+        console.log("Insert Document :\n",result.ops);
+        
+        dboper.findDocuments(db,'dishes',(docs)=>{
+            console.log("FOund Documents :\n", docs);
 
-        console.log("data Inserted");
-        console.log(result.ops);
+            dboper.updateDocument(db,{name:"vadolnut"},{description:"this is test update"},'dishes',(result)=>{
+                console.log("Updated Document : \n", result.result)
 
-        collection.find({}).toArray((err,docs)=>{
-            assert.equal(err,null);
-
-            console.log("FOund : \n");
-            console.log(docs);
-            
-            db.dropCollection("dishes",(err,result)=>{
-                assert.equal(err,null);
-
-                console.log(result);
-                client.close();
+                db.dropCollection('dishes',(result)=>{
+                    console.log("Collection Removed : ", result)
+                    client.close();
+                })
             })
         })
     })

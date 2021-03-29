@@ -10,7 +10,7 @@ exports.insertDocument = (db,collection,callback)=>{
  })   
 }
 
-exports.findDocuments = (db,collection,callback)=>{
+exports.findDocuments = (db,document,collection,callback)=>{
     const coll = db.collection(collection);
     coll.find({}).toArray((err,docs)=>{
         assert.equal(err,null);
@@ -28,7 +28,7 @@ exports.removeDocument = (db,collection,callback)=>{
     }) 
 }
 
-exports.updateDocument = (db,collection,callback)=>{
+exports.updateDocument = (db,document,collection,callback)=>{
     const coll = db.collection(collection);
     coll.insertOne(document,{ $set: update },null,(err,result)=>{
         assert.equal(err,null);
