@@ -1,46 +1,89 @@
 var express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+
+const Dishes = require('../model/dish');
 
 const dishRouter = express.Router()
-dishRouter.use(bodyParser.json());
+dishRouter.use(bodyParser.urlencoded({extended:false}))
+dishRouter.use(bodyParser.json())
+// dishRouter.use(express.json());
+// dishRouter.use(express.urlencoded({ extended: false }));
 
 dishRouter.route('/')
-.all((req,res,next)=>{
-    res.statusCode = 200;
-    res.setHeader('Content-Type','text/html');
-    next();
-})
+
 .get((req,res,next)=>{
-    res.end("here You will get all dishes ...")
+    Dishes.find({})
+    .then((dishes)=>{
+        res.statusCode= 200;
+        res.setHeader('Content-Type',"application/json");
+        res.json(dishes)
+    },(err)=> next(err))
+    .catch((err)=>{
+        next(err);
+    })
 })
 .post((req,res,next)=>{
-    res.end("here you can add some dishes .... ")    
+    Dishes.create(req.body)
+    .then((dish)=>{
+        console.log("Your Dish Was :\n",dish)
+        res.statusCode= 200;
+        res.setHeader('Content-Type',"application/json");
+        res.json(dish)
+    },(err)=> next(err))
+    .catch((er)=> next(err))
 })
 .put((req,res,next)=>{
     res.end("This is operation is not supported ... ")
 })
 .delete((req,res,next)=>{
-    res.end("this will delete all dishes")
+    Dishes.deleteMany({})
+   .then((resp)=>{
+       console.log("all Items deleted")
+    res.statusCode= 200;
+    res.setHeader('Content-Type',"application/json");
+    res.json(resp)
+   },(err)= next(err))
+   .catch((err)=> nect(err))
 });
 
 dishRouter.route('/:dishId')
-.all((req,res,next)=>{
-    res.statusCode = 200;
-    res.setHeader('Content-type','text/html');
-    next();
-})
+
 .get((req,res,next)=>{
-    res.end("here You will get info about  dish having id : " + req.params.dishId );
+    Dishes.findById(req.params.dishId)
+    .then((dish)=>{
+        console.log("Your Dish Was :\n",dish)
+        res.statusCode= 200;
+        res.setHeader('Content-Type',"application/json");
+        res.json(dish)
+    },(err)=> next(err))
+    .catch((er)=> next(err))
 })
 
 .post((req,res,next)=>{
     res.end("This operations is not supported... ")
 })
 .put((req,res,next)=>{
-    res.end("this will edit the dish havind id :" + req.params.dishId)
+    Dishes.findByIdandUpdate(req.params.dishId, {
+        $set : req.body
+    },{ new : true} )
+    .then((dish)=>{
+        console.log("Your Dish Was :\n",dish)
+        res.statusCode= 200;
+        res.setHeader('Content-Type',"application/json");
+        res.json(dish)
+    },(err) => next(err))
+    .catch((err)=> next(err))
 })
 .delete((req,res,next)=>{
-    res.end("this will delete dish having Id : "+ req.params.dishId)
+    Dishes.deleteOne(req.params.dishId)
+    .then((resp)=>{
+        console.log("Item was Deleted");
+        res.statusCode= 200;
+        res.setHeader('Content-Type',"application/json");
+        res.json(resp)
+    },(err) => next(err))
+    .catch((err) => next(err) )
 });
 
 module.exports = dishRouter;
